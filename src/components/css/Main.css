@@ -1,7 +1,9 @@
-div.container {
-  width: inherit;
-  height: 100vh;
+div.container-fp {
+  min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  -ms-overflow-style: none;
+}
+div.container-fp::-webkit-scrollbar {
+  display: none;
 }

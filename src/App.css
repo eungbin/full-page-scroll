@@ -2,4 +2,8 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  -ms-overflow-style: none;
+}
+.App::-webkit-scrollbar {
+  display: none;
 }

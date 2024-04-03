@@ -1,6 +1,18 @@
 {
   "name": "full-page-scroll",
   "version": "0.1.0",
+  "license": "MIT",
+  "main": "index.js",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/eungbin/full-page-scroll/issues",
+    "email": "programmer97@naver.com"
+  },
+  "author": "Covy Kim <programmer97@naver.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eungbin/full-page-scroll.git"
+  },
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
