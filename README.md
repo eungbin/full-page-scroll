@@ -2,4 +2,4 @@
 
 ## Stack
 - html, css, javascript
-- react, jquery
+- react
