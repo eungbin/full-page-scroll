@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './css/Main.css';
 
-export default function Main(props) {
+export default function FullPageScroll(props) {
   const scrolling = useRef(false);
   const currentPage = useRef(0); // now page
   const totalPage = useRef(0);   // all page's length

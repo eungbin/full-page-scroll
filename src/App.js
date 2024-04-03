@@ -1,16 +1,16 @@
 import './App.css';
-import React, { useState, useEffect, useRef } from 'react';
-import Main from './components/Main';
+import React, {  } from 'react';
+import FullPageScroll from './components/FullPageScroll';
 
 function App() {
 
   return (
-    <Main>
+    <FullPageScroll>
       <div id='fp-contents' style={{backgroundColor:'orange', height:'100vh'}}></div>
       <div id='fp-contents' style={{backgroundColor:'lightcoral', height:'100vh'}}></div>
       <div id='fp-contents' style={{backgroundColor:'orange', height:'100vh'}}></div>
       <div id='fp-contents' style={{backgroundColor:'lightcoral', height:'100vh'}}></div>
-    </Main>
+    </FullPageScroll>
   );
 }
 
