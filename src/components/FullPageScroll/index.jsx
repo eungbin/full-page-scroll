@@ -3,15 +3,20 @@ import './css/Main.css';
 
 export default function FullPageScroll(props) {
   const scrolling = useRef(false);
+  const dragging = useRef(false);
   const currentPage = useRef(0); // now page
   const totalPage = useRef(0);   // all page's length
   const outerDiv = useRef(null);
   const contents = useRef(null);
+  const mouseScreenY = useRef(0);
+  const initMouseScreenY = useRef(0);
+  const pageHeight = useRef(0);
 
   useEffect(() => {
     totalPage.current = document.getElementById('outer').children.length;
     contents.current = document.getElementById('outer').children;
     outerDiv.current = document.getElementById('outer');
+    pageHeight.current = outerDiv.current?.children.item(0)?.clientHeight; // 100vh(화면 세로 길이)
 
     outerDiv.current.addEventListener('wheel', handleWheel);
     outerDiv.current.addEventListener('touchstart', touchDown);
@@ -48,11 +53,10 @@ export default function FullPageScroll(props) {
     if(currentPage.current === 0) return;
 
     currentPage.current -= 1;
-    const pageHeight = outerDiv.current?.children.item(0)?.clientHeight; // 100vh(화면 세로 길이)
 
-    if(pageHeight && outerDiv.current) {
+    if(pageHeight.current && outerDiv.current) {
       window.scrollTo({
-        top: pageHeight * (currentPage.current),
+        top: pageHeight.current * (currentPage.current),
 				left: 0,
 				behavior: "smooth",
       })
@@ -67,11 +71,10 @@ export default function FullPageScroll(props) {
     if(currentPage.current === totalPage.current-1) return;
 
     currentPage.current += 1;
-    const pageHeight = outerDiv.current?.children.item(0)?.clientHeight; // 100vh(화면 세로 길이)
 
-    if(pageHeight && outerDiv.current) {
+    if(pageHeight.current && outerDiv.current) {
       window.scrollTo({
-        top: pageHeight * (currentPage.current),
+        top: pageHeight.current * (currentPage.current),
 				left: 0,
 				behavior: "smooth",
       })
@@ -80,6 +83,15 @@ export default function FullPageScroll(props) {
     setTimeout(() => {
       scrolling.current = false;
     }, 500);
+  }
+
+  const scrollBack = () => {
+
+    window.scrollTo({
+      top: pageHeight.current * (currentPage.current),
+			left: 0,
+			behavior: "smooth",
+    })
   }
 
   /**
@@ -98,10 +110,23 @@ export default function FullPageScroll(props) {
    * @param {*} e 
    */
   const mouseDown = (e) => {
-    
+    mouseScreenY.current = e.screenY;
+    initMouseScreenY.current = e.screenY;
+    dragging.current = true;
   }
   const mouseUp = (e) => {
+    const movedMouseY = e.screenY-initMouseScreenY.current;
 
+    if(Math.abs(movedMouseY) > pageHeight.current/2) {
+      if(movedMouseY > 0) {
+        scrollUp();
+      } else {
+        scrollDown();
+      }
+    } else {
+      scrollBack();
+    }
+    dragging.current = false;
   }
 
   const handleScroll = (e) => {
@@ -109,7 +134,11 @@ export default function FullPageScroll(props) {
   }
 
   const handleMouse = (e) => {
-
+    let movedMouseY = e.screenY - mouseScreenY.current;
+    if(dragging.current) {
+      window.scrollBy(0, movedMouseY * -1);
+      mouseScreenY.current = e.screenY;
+    }
   }
 
   return (
