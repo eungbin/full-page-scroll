@@ -10,14 +10,21 @@ function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return 
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 function FullPageScroll(props) {
   const scrolling = (0, _react.useRef)(false);
+  const dragging = (0, _react.useRef)(false);
   const currentPage = (0, _react.useRef)(0); // now page
   const totalPage = (0, _react.useRef)(0); // all page's length
   const outerDiv = (0, _react.useRef)(null);
   const contents = (0, _react.useRef)(null);
+  const mouseScreenY = (0, _react.useRef)(0);
+  const initMouseScreenY = (0, _react.useRef)(0);
+  const pageHeight = (0, _react.useRef)(0);
   (0, _react.useEffect)(() => {
+    var _outerDiv$current;
     totalPage.current = document.getElementById('outer').children.length;
     contents.current = document.getElementById('outer').children;
     outerDiv.current = document.getElementById('outer');
+    pageHeight.current = (_outerDiv$current = outerDiv.current) === null || _outerDiv$current === void 0 || (_outerDiv$current = _outerDiv$current.children.item(0)) === null || _outerDiv$current === void 0 ? void 0 : _outerDiv$current.clientHeight; // 100vh(화면 세로 길이)
+
     outerDiv.current.addEventListener('wheel', handleWheel);
     outerDiv.current.addEventListener('touchstart', touchDown);
     outerDiv.current.addEventListener('toudchend', touchUp);
@@ -49,14 +56,11 @@ function FullPageScroll(props) {
     if (deltaY < 0) scrollUp();else scrollDown();
   };
   const scrollUp = () => {
-    var _outerDiv$current;
     if (currentPage.current === 0) return;
     currentPage.current -= 1;
-    const pageHeight = (_outerDiv$current = outerDiv.current) === null || _outerDiv$current === void 0 || (_outerDiv$current = _outerDiv$current.children.item(0)) === null || _outerDiv$current === void 0 ? void 0 : _outerDiv$current.clientHeight; // 100vh(화면 세로 길이)
-
-    if (pageHeight && outerDiv.current) {
+    if (pageHeight.current && outerDiv.current) {
       window.scrollTo({
-        top: pageHeight * currentPage.current,
+        top: pageHeight.current * currentPage.current,
         left: 0,
         behavior: "smooth"
       });
@@ -67,14 +71,11 @@ function FullPageScroll(props) {
     }, 500);
   };
   const scrollDown = () => {
-    var _outerDiv$current2;
     if (currentPage.current === totalPage.current - 1) return;
     currentPage.current += 1;
-    const pageHeight = (_outerDiv$current2 = outerDiv.current) === null || _outerDiv$current2 === void 0 || (_outerDiv$current2 = _outerDiv$current2.children.item(0)) === null || _outerDiv$current2 === void 0 ? void 0 : _outerDiv$current2.clientHeight; // 100vh(화면 세로 길이)
-
-    if (pageHeight && outerDiv.current) {
+    if (pageHeight.current && outerDiv.current) {
       window.scrollTo({
-        top: pageHeight * currentPage.current,
+        top: pageHeight.current * currentPage.current,
         left: 0,
         behavior: "smooth"
       });
@@ -83,6 +84,13 @@ function FullPageScroll(props) {
     setTimeout(() => {
       scrolling.current = false;
     }, 500);
+  };
+  const scrollBack = () => {
+    window.scrollTo({
+      top: pageHeight.current * currentPage.current,
+      left: 0,
+      behavior: "smooth"
+    });
   };
 
   /**
@@ -100,12 +108,34 @@ function FullPageScroll(props) {
    * Desktop mouse drag
    * @param {*} e 
    */
-  const mouseDown = e => {};
-  const mouseUp = e => {};
+  const mouseDown = e => {
+    mouseScreenY.current = e.screenY;
+    initMouseScreenY.current = e.screenY;
+    dragging.current = true;
+  };
+  const mouseUp = e => {
+    const movedMouseY = e.screenY - initMouseScreenY.current;
+    if (Math.abs(movedMouseY) > pageHeight.current / 2) {
+      if (movedMouseY > 0) {
+        scrollUp();
+      } else {
+        scrollDown();
+      }
+    } else {
+      scrollBack();
+    }
+    dragging.current = false;
+  };
   const handleScroll = e => {
     e.preventDefault();
   };
-  const handleMouse = e => {};
+  const handleMouse = e => {
+    let movedMouseY = e.screenY - mouseScreenY.current;
+    if (dragging.current) {
+      window.scrollBy(0, movedMouseY * -1);
+      mouseScreenY.current = e.screenY;
+    }
+  };
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "container-fp",
     id: 'outer'
