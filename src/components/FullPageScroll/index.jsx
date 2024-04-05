@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './css/Main.css';
+import './css/index.css';
 
 export default function FullPageScroll(props) {
   const scrolling = useRef(false);
@@ -7,14 +7,13 @@ export default function FullPageScroll(props) {
   const currentPage = useRef(0); // now page
   const totalPage = useRef(0);   // all page's length
   const outerDiv = useRef(null);
-  const contents = useRef(null);
+  const [contents, setContents] = useState([]);
   const mouseScreenY = useRef(0);
   const initMouseScreenY = useRef(0);
   const pageHeight = useRef(0);
 
   useEffect(() => {
-    totalPage.current = document.getElementById('outer').children.length;
-    contents.current = document.getElementById('outer').children;
+    totalPage.current = document.getElementById('outer').children.length/2;
     outerDiv.current = document.getElementById('outer');
     pageHeight.current = outerDiv.current?.children.item(0)?.clientHeight; // 100vh(화면 세로 길이)
 
@@ -36,6 +35,16 @@ export default function FullPageScroll(props) {
     };
   }, []);
 
+  useEffect(() => {
+    setContents([...props.children]);
+  }, [props.children]);
+
+  useEffect(() => {
+    window.onbeforeunload = function pushRefresh() {
+      window.scrollTo(0, 0);
+    };
+  }, []);
+
   /**
    * Desktop mouse wheel
    * @param {*} e 
@@ -53,6 +62,7 @@ export default function FullPageScroll(props) {
     if(currentPage.current === 0) return;
 
     currentPage.current -= 1;
+    changeClass(currentPage.current+1, currentPage.current);
 
     if(pageHeight.current && outerDiv.current) {
       window.scrollTo({
@@ -71,6 +81,7 @@ export default function FullPageScroll(props) {
     if(currentPage.current === totalPage.current-1) return;
 
     currentPage.current += 1;
+    changeClass(currentPage.current-1, currentPage.current);
 
     if(pageHeight.current && outerDiv.current) {
       window.scrollTo({
@@ -141,9 +152,22 @@ export default function FullPageScroll(props) {
     }
   }
 
+  const changeClass = (prevPage, nowPage) => {
+    const prevElem = document.getElementById('index'+String(prevPage));
+    const nowElem = document.getElementById('index'+String(nowPage));
+
+    prevElem.className = 'content-fp-index';
+    nowElem.className = 'content-fp-index selected';
+  }
+
   return (
     <div className="container-fp" id={'outer'}>
       {props?.children}
+      <div className="wrapper-fp-index">
+        {contents?.map((v, idx) => (
+          <div key={idx} className={idx === 0 ? "content-fp-index selected" : "content-fp-index"} id={'index'+String(idx)}></div>
+        ))}
+      </div>
     </div>
   );
 }
