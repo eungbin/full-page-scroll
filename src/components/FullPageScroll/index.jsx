@@ -13,7 +13,7 @@ export default function FullPageScroll(props) {
   const pageHeight = useRef(0);
 
   useEffect(() => {
-    totalPage.current = document.getElementById('outer').children.length/2;
+    totalPage.current = document.getElementById('outer').children.length-1;
     outerDiv.current = document.getElementById('outer');
     pageHeight.current = outerDiv.current?.children.item(0)?.clientHeight; // 100vh(화면 세로 길이)
 
@@ -66,7 +66,7 @@ export default function FullPageScroll(props) {
 
     if(pageHeight.current && outerDiv.current) {
       window.scrollTo({
-        top: pageHeight.current * (currentPage.current),
+        top: window.pageYOffset + outerDiv.current.getBoundingClientRect().top + pageHeight.current * (currentPage.current),
 				left: 0,
 				behavior: "smooth",
       })
@@ -78,14 +78,14 @@ export default function FullPageScroll(props) {
   }
 
   const scrollDown = () => {
-    if(currentPage.current === totalPage.current-1) return;
+    if(currentPage.current >= totalPage.current-1) return;
 
     currentPage.current += 1;
     changeClass(currentPage.current-1, currentPage.current);
 
     if(pageHeight.current && outerDiv.current) {
       window.scrollTo({
-        top: pageHeight.current * (currentPage.current),
+        top: window.pageYOffset + outerDiv.current.getBoundingClientRect().top + pageHeight.current * (currentPage.current),
 				left: 0,
 				behavior: "smooth",
       })
@@ -97,9 +97,8 @@ export default function FullPageScroll(props) {
   }
 
   const scrollBack = () => {
-
     window.scrollTo({
-      top: pageHeight.current * (currentPage.current),
+      top: window.pageYOffset + outerDiv.current.getBoundingClientRect().top + pageHeight.current * (currentPage.current),
 			left: 0,
 			behavior: "smooth",
     })
@@ -160,12 +159,23 @@ export default function FullPageScroll(props) {
     nowElem.className = 'content-fp-index selected';
   }
 
+  const goDirectIndex = (idx) => {
+    changeClass(currentPage.current, idx);
+    currentPage.current = idx;
+
+    window.scrollTo({
+      top: window.pageYOffset + outerDiv.current.getBoundingClientRect().top + pageHeight.current * (currentPage.current),
+			left: 0,
+			behavior: "smooth",
+    })
+  }
+
   return (
     <div className="container-fp" id={'outer'}>
       {props?.children}
       <div className="wrapper-fp-index">
         {contents?.map((v, idx) => (
-          <div key={idx} className={idx === 0 ? "content-fp-index selected" : "content-fp-index"} id={'index'+String(idx)}></div>
+          <div onClick={() => goDirectIndex(idx)} key={idx} className={idx === 0 ? "content-fp-index selected" : "content-fp-index"} id={'index'+String(idx)}></div>
         ))}
       </div>
     </div>
