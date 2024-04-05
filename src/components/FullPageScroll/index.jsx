@@ -24,6 +24,10 @@ export default function FullPageScroll(props) {
     outerDiv.current.addEventListener('mousedown', mouseDown);
     outerDiv.current.addEventListener('mouseup', mouseUp);
     outerDiv.current.addEventListener('mousemove', handleMouse);
+
+    window.addEventListener(`resize`, function() {
+      pageHeight.current = outerDiv.current?.children.item(0)?.clientHeight; // 100vh(화면 세로 길이)
+    });
     return () => {
       outerDiv.current.removeEventListener('wheel', handleWheel);
       outerDiv.current.removeEventListener('touchstart', touchDown);
@@ -32,6 +36,10 @@ export default function FullPageScroll(props) {
       outerDiv.current.removeEventListener('mousedown', mouseDown);
       outerDiv.current.removeEventListener('mouseup', mouseUp);
       outerDiv.current.removeEventListener('mousemove', handleMouse);
+
+      window.removeEventListener(`resize`, function() {
+        pageHeight.current = outerDiv.current?.children.item(0)?.clientHeight; // 100vh(화면 세로 길이)
+      });
     };
   }, []);
 
